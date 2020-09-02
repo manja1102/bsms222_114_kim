@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "R basics_20200906"
 output: html_notebook
 ---
 
@@ -63,6 +63,7 @@ Now since these values are saved in variables, to obtain a solution to our equat
 ###2.2.3 Functions
 
 Once you define variables, the data analysis process can usually be described as a series of functions applied to the data. R includes several predefined functions and most of the analysis pipelines we construct make extensive use of these.
+
 
 
 
