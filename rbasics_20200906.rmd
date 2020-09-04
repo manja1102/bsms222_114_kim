@@ -41,7 +41,7 @@ print(a)
 We use the term object to describe stuff that is stored in R. Variables are examples, but objects can also be more complicated entities such as functions, which are described later.
 
 
-###2.2.2 The workspace
+### 2.2.2 The workspace
 
 As we define objects in the console, we are actually changing the workspace. You can see all the variables saved in your workspace by typing:
 
@@ -60,7 +60,7 @@ Now since these values are saved in variables, to obtain a solution to our equat
 (-b - sqrt(b^2 - 4*a*c) ) / ( 2*a )
 #> [1] -1.62
 ```
-###2.2.3 Functions
+### 2.2.3 Functions
 
 Once you define variables, the data analysis process can usually be described as a series of functions applied to the data. R includes several predefined functions and most of the analysis pipelines we construct make extensive use of these.
 
@@ -145,7 +145,7 @@ or
 ?">"
 ```
 
-###2.2.4 Other prebuilt objects
+### 2.2.4 Other prebuilt objects
 
 There are several datasets that are included for users to practice and test out functions. You can see all the available datasets by typing:
 
@@ -166,7 +166,7 @@ pi
 Inf+1
 ```
 
-###2.2.5 variable names
+### 2.2.5 variable names
 
 We have used the letters `a`, `b`, and `c` as variable names, but variable names can be almost anything. Some basic rules in R are that variable names have to start with a letter, can’t contain spaces, and should not be variables that are predefined in R. For example, don’t name one of your variables `install.packages` by typing something like `install.packages <- 2`.
 
@@ -179,13 +179,13 @@ solution_2 <- (-b - sqrt(b^2 - 4*a*c)) / (2*a)
 
 For more advice, we highly recommend studying Hadley Wickham’s style guide15.
 
-###2.2.6 Saving your workspace
+### 2.2.6 Saving your workspace
 
 Values remain in the workspace until you end your session or erase them with the function `rm`. But workspaces also can be saved for later use. In fact, when you quit R, the program asks you if you want to save your workspace. If you do save it, the next time you start R, the program will restore the workspace.
 
 We actually recommend against saving the workspace this way because, as you start working on different projects, it will become harder to keep track of what is saved. Instead, we recommend you assign the workspace a specific name. You can do this by using the function `save` or `save.image`. To load, use the function `load`. When saving a workspace, we recommend the suffix `rda` or `RData`. In RStudio, you can also do this by navigating to the Session tab and choosing Save Workspace as. You can later load it using the Load Workspace options in the same tab. You can read the help pages on `save`, `save.image`, and `load` to learn more.
 
-###2.2.7 Motivating scripts
+### 2.2.7 Motivating scripts
 
 To solve another equation such as $3x^2+2x-1$, we can copy and paste the code above and then redefine the variables and recompute the solution:
 
@@ -199,7 +199,7 @@ c <- -1
 
 By creating and saving a script with the code above, we would not need to retype everything each time and, instead, simply change the variable names. Try writing the script above into an editor and notice how easy it is to change the variables and receive an answer.
 
-###2.2.8 
+### 2.2.8 
 
 If a line of R code starts with the symbol `#`, it is not evaluated. We can use this to write reminders of why we wrote particular code. For example, in the script above we could add:
 
@@ -209,18 +209,31 @@ If a line of R code starts with the symbol `#`, it is not evaluated. We can use 
 a <- 3 
 b <- 2
 c <- -1
-
 ## now compute the solution
 (-b + sqrt(b^2 - 4*a*c)) / (2*a)
 (-b - sqrt(b^2 - 4*a*c)) / (2*a)
 ```
 
 
-#2.3 Exercises
+# 2.3 Exercises
 
-1. 1. What is the sum of the first 100 positive integers? The formula for the sum of integers $1$ through $n$ is $n(n+1)/2$. Define $n=100$ and then use R to compute the sum of $1$ through $100$ using the formula. What is the sum?
+1. What is the sum of the first 100 positive integers? The formula for the sum of integers $1$ through $n$ is $n(n+1)/2$. Define $n=100$ and then use R to compute the sum of $1$ through $100$ using the formula. What is the sum?
+
+```{r}
+n <- 100
+n*(n+1)/2
+
+```
+**answer: 5050**
 
 2. Now use the same formula to compute the sum of the integers from 1 through 1,000.
+
+```{r}
+n <- 1000
+n*(n+1)/2
+
+```
+*8answer: 500500*
 
 3. Look at the result of typing the following code into R:
 
@@ -237,7 +250,13 @@ b. `seq` creates a list of numbers and `sum` adds them up.
 c. `seq` creates a random list and `sum` computes the `sum` of 1 through 1,000.
 d. `sum` always returns the same number.
 
+**answer: b**
+
 4.In math and programming, we say that we evaluate a function when we replace the argument with a given number. So if we type `sqrt(4)`, we evaluate the `sqrt` function. In R, you can evaluate a function inside another function. The evaluations happen from the inside out. Use one line of code to compute the log, in base 10, of the square root of 100.
+
+```{r}
+log(sqrt(100),10)
+```
 
 5. Which of the following will always return the numeric value stored in `x?` You can try out examples and use the help system if you want.
 
@@ -249,7 +268,7 @@ d.`exp(log(x, base=2))`
 #### example solutions
 
 a,b,d examples' values change according to the x
-but whatever x is, example c value are always x
+but whatever x is, example c values are always x
 
 suppose, x=4
 ```{r}
@@ -260,8 +279,9 @@ if, x= 6
 log(exp(6))
 ```
 
+**answer: c**
 
-#2.4 Data types
+# 2.4 Data types
 
 Variables in R can be of different types. For example, we need to distinguish numbers from character strings and tables from simple lists of numbers. The function `class` helps us determine what type of object we have:
 
@@ -272,7 +292,7 @@ class(a)
 
 To work efficiently in R, it is important to learn the different types of variables and what we can do with these.
 
-###2.4.1 Data frames
+### 2.4.1 Data frames
 
 Up to now, the variables we have defined are just one number. This is not very useful for storing data. The most common way of storing a dataset in R is in a data frame. Conceptually, we can think of a data frame as a table with rows representing observations and the different variables reported for each observation defining the columns. Data frames are particularly useful for datasets because we can combine different data types into one object.
 
@@ -289,7 +309,7 @@ To see that this is in fact a data frame, we type:
 class(murders)
 ```
 
-###2.4.2 Examining an object
+### 2.4.2 Examining an object
 
 The function str is useful for finding out more about the structure of an object:
 
@@ -306,7 +326,7 @@ In this dataset, each state is considered an observation and five variables are 
 
 Before we go any further in answering our original question about different states, let’s learn more about the components of this object.
 
-###2.4.3 The accessor: `$`
+### 2.4.3 The accessor: `$`
 
 For our analysis, we will need to access the different variables represented by columns included in this data frame. To do this, we use the accessor operator `$` in the following way:
 
@@ -324,7 +344,7 @@ It is important to know that the order of the entries in `murders$population` pr
 
 **Tip**: R comes with a very nice auto-complete functionality that saves us the trouble of typing out all the names. Try typing `murders$p` then hitting the tab key on your keyboard. This functionality and many other useful auto-complete features are available when working in RStudio.
 
-###2.4.4 Vectors: numerics, characters, and logical
+### 2.4.4 Vectors: numerics, characters, and logical
 
 The object `murders$population` is not one number but several. We call these types of objects vectors. A single number is technically a vector of length 1, but in general we use the term vectors to refer to objects with several entries. The function `length` tells you how many entries are in the vector:
 ```{r}
@@ -369,7 +389,7 @@ We discuss more important features of vectors after the next set of exercises.
 
 **Advanced**: Mathematically, the values in pop are integers and there is an integer class in R. However, by default, numbers are assigned class numeric even when they are round integers. For example, `class(1)` returns numeric. You can turn them into class integer with the `as.integer()` function or by adding an `L` like this: `1L`. Note the class by typing: `class(1L)`
 
-###2.4.5 Factors
+### 2.4.5 Factors
 
 In the `murders` dataset, we might expect the region to also be a character vector. However, it is not:
 
@@ -398,7 +418,7 @@ levels(region)
 
 The new order is in agreement with the fact that the Northeast has the least murders and the South has the most.
 
-###2.4.6 Lists
+### 2.4.6 Lists
 
 Data frames are a special case of lists. We will cover lists in more detail later, but know that they are useful because you can store any combination of different types. Below is an example of a list we created for you:
 
@@ -410,7 +430,6 @@ record[['grades']] <- c('95','82','91','97','93')
 record[['final_grade']] <- 'A'
 record
 class(record)
-
 ```
 
 As with data frames, you can extract the components of a list with the accessor `$`. In fact, data frames are a type of list.
@@ -451,7 +470,7 @@ record2[[1]]
 
 We won’t be using lists until later, but you might encounter one in your own exploration of R. For this reason, we show you some basics here
 
-###2.4.7 Matrics
+### 2.4.7 Matrics
 
 Matrices are another type of object that are common in R. Matrices are similar to data frames in that they are two-dimensional: they have rows and columns. However, like numeric, character and logical vectors, entries in matrices have to be all the same type. For this reason data frames are much more useful for storing data, since we can have characters, factors, and numbers in them.
 
@@ -486,4 +505,224 @@ mat[ ,3]
 
 This is also a vector, not a matrix.
 
-You can access more than one column or more than one row if you like. This will give you a new matrix.
+Similarly, if you want the entire third column, you leave the row spot empty:
+
+```{r}
+mat[, 2:3]
+```
+
+You can subset both rows and columns:
+
+```{r}
+mat [1:2, 2:3]
+```
+
+We can convert matrices into data frames using the function `as.data.frame`:
+
+```{r}
+as.data.frame(mat)
+```
+
+You can also use single square brackets (`[`) to access rows and columns of a data frame:
+
+```{r}
+data("murders")
+murders[25, 1]
+murders [2:3, ]
+```
+
+
+# 2.5 Exercise
+
+1. Load the US murders dataset.
+
+```{r}
+library(dslabs)
+data(murders)
+```
+
+Use the function `str` to examine the structure of the `murders` object. Which of the following best describes the variables represented in this data frame?
+
+a. The 51 states.
+b. The murder rates for all 50 states and DC.
+c. The state name, the abbreviation of the state name, the state’s region, and the state’s population and total number of murders for 2010.
+d. `str` shows no relevant information.
+```{r}
+str(murders)
+```
+
+answer: c
+
+2. What are the column names used by the data frame for these five variables? 
+
+answer: state, abb, region, population, total
+
+3. Use the accessor `$` to extract the state abbreviations and assign them to the object a. What is the class of this object?
+
+```{r}
+murders$abb <- a
+class(a)
+```
+ answer: numeric
+ 
+4. Now use the square brackets to extract the state abbreviations and assign them to the object b. Use the identical function to determine if a and b are the same.
+
+```{r}
+murders[["abb"]] <- b 
+a==b
+
+
+```
+
+5. We saw that the region column stores a factor. You can corroborate this by typing:
+
+```{r}
+class(murders$region)
+```
+
+With one line of code, use the function `levels` and `length` to determine the number of regions defined by this dataset.
+
+```{r}
+levels(murders$region)
+```
+```{r}
+length(murders$region)
+```
+
+6. The function `table` takes a vector and returns the frequency of each element. You can quickly see how many states are in each region by applying this function. Use this function in one line of code to create a table of states per region.
+
+```{r}
+table(murders$region)
+```
+
+# 2.6 Vectors
+
+In R, the most basic objects available to store data are vectors. As we have seen, complex datasets can usually be broken down into components that are vectors. For example, in a data frame, each column is a vector. Here we learn more about this important class.
+
+### 2.6.1 Creating vectors
+
+We can create vectors using the function `c`, which stands for concatenate. We use `c` to concatenate entries in the following way:
+
+```{r}
+codes <- c(380, 124, 818)
+codes
+```
+
+We can also create character vectors. We use the quotes to denote that the entries are characters rather than variable names.
+
+```{r}
+country <- c("italy", "canada", "egypt")
+```
+
+In R you can also use single quotes:
+
+```{r}
+country <- c('italy', 'canada', 'egypt')
+```
+
+But be careful not to confuse the single quote ’ with the <em> back quote `</em>. 
+
+By now you should know that if you type:
+
+```{r}
+country <- c(italy, canada, egypt)
+```
+
+### 2.6.2 Names
+
+Sometimes it is useful to name the entries of a vector. For example, when defining a vector of country codes, we can use the names to connect the two:
+
+```{r}
+codes <- c(italy = 380, canada = 124, egypt = 818)
+codes
+```
+
+The object `codes` continues to be a numeric vector:
+
+```{r}
+class(codes)
+```
+
+but with names:
+
+```{r}
+names(codes)
+```
+
+If the use of strings without quotes looks confusing, know that you can use the quotes as well
+
+```{r}
+codes <- c("italy" = 380, "canada" = 124, "egypt" = 818)
+codes
+```
+
+There is no difference between this function call and the previous one. This is one of the many ways in which R is quirky compared to other languages.
+
+We can also assign names using the `names` functions:
+
+```{r}
+codes <- c(380, 124, 818)
+country <- c("italy","canada","egypt")
+names(codes) <- country
+codes
+```
+
+### 2.6.3 Sequence
+
+Another useful function for creating vectors generates sequences:
+
+```{r}
+seq(1, 10)
+```
+
+The first argument defines the start, and the second defines the end which is included. The default is to go up in increments of 1, but a third argument lets us tell it how much to jump by:
+
+```{r}
+seq(1, 10,2 )
+```
+
+If we want consecutive integers, we can use the following shorthand:
+
+```{r}
+1:10
+```
+
+When we use these functions, R produces integers, not numerics, because they are typically used to index something:
+
+```{r}
+class(1:10)
+```
+
+However, if we create a sequence including non-integers, the class changes:
+
+```{r}
+class(seq(1, 10, 0.5))
+```
+
+### 2.6.4 Subsetting
+
+We use square brackets to access specific elements of a vector. For the vector codes we defined above, we can access the second element using:
+
+```{r}
+codes[2]
+```
+
+You can get more than one entry by using a multi-entry vector as an index:
+
+```{r}
+codes[c(1,3)]
+```
+
+The sequences defined above are particularly useful if we want to access, say, the first two elements:
+
+```{r}
+codes[1:2]
+```
+
+If the elements have names, we can also access the entries using these names. Below are two examples.
+
+```{r}
+codes["canada"]
+codes[c("egypt", "italy")]
+```
+
