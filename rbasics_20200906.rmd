@@ -28,12 +28,10 @@ Copy and paste the code above into your console to define the three variables. N
 
 To see the value stored in a variable, we simply ask R to evaluate a and it shows the stored value:
 
-
 ```{r}
 a
 ```
 A more explicit way to ask R to show us the value stored in `a` is using `print` like this:
-
 
 ```{r}
 print(a)
@@ -60,6 +58,7 @@ Now since these values are saved in variables, to obtain a solution to our equat
 (-b - sqrt(b^2 - 4*a*c) ) / ( 2*a )
 #> [1] -1.62
 ```
+
 ### 2.2.3 Functions
 
 Once you define variables, the data analysis process can usually be described as a series of functions applied to the data. R includes several predefined functions and most of the analysis pipelines we construct make extensive use of these.
@@ -233,7 +232,7 @@ n <- 1000
 n*(n+1)/2
 
 ```
-*8answer: 500500*
+**answer: 500500**
 
 3. Look at the result of typing the following code into R:
 
@@ -547,15 +546,16 @@ a. The 51 states.
 b. The murder rates for all 50 states and DC.
 c. The state name, the abbreviation of the state name, the state’s region, and the state’s population and total number of murders for 2010.
 d. `str` shows no relevant information.
+
 ```{r}
 str(murders)
 ```
 
-answer: c
+**answer: c**
 
 2. What are the column names used by the data frame for these five variables? 
 
-answer: state, abb, region, population, total
+**answer: state, abb, region, population, total**
 
 3. Use the accessor `$` to extract the state abbreviations and assign them to the object a. What is the class of this object?
 
@@ -563,7 +563,7 @@ answer: state, abb, region, population, total
 murders$abb <- a
 class(a)
 ```
- answer: numeric
+**answer: numeric**
  
 4. Now use the square brackets to extract the state abbreviations and assign them to the object b. Use the identical function to determine if a and b are the same.
 
