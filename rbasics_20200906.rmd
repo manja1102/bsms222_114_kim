@@ -560,7 +560,7 @@ str(murders)
 3. Use the accessor `$` to extract the state abbreviations and assign them to the object a. What is the class of this object?
 
 ```{r}
-murders$abb <- a
+a -> murders$abb
 class(a)
 ```
 **answer: numeric**
@@ -568,10 +568,8 @@ class(a)
 4. Now use the square brackets to extract the state abbreviations and assign them to the object b. Use the identical function to determine if a and b are the same.
 
 ```{r}
-murders[["abb"]] <- b 
+b -> murders[["abb"]]  
 a==b
-
-
 ```
 
 5. We saw that the region column stores a factor. You can corroborate this by typing:
