@@ -1,11 +1,13 @@
 ---
 title: "rbasics_20200909"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 # **2.7 Coercion**
 
-In general, <em>coercion</em> is an attempt by R to be flexible with data types. When an entry does not match the expected, some of the prebuilt R functions try to guess what was meant before throwing an error. This can also lead to confusion. Failing to understand coercion can drive programmers crazy when attempting to code in R since it behaves quite differently from most other languages in this regard. Let’s learn about it with some examples.
+In general, <em>coercion</em> is an attempt by R to be flexible with data types. When an entry does not match the expected, some of the prebuilt R functions try to guess what was meant before throwing an error. This can also lead to confusion. Failing to understand coercion can drive programmers crazy when attempting to code in R since it behaves quite differently from most other languages in this regard. Let’s learn about it with some examples.  
 
 We said that vectors must be all of the same type. So if we try to combine, say, numbers and characters, you might expect an error:
 ```{r}
