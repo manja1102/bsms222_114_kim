@@ -40,7 +40,7 @@ We use the term object to describe stuff that is stored in R. Variables are exam
 
 As we define objects in the console, we are actually changing the workspace. You can see all the variables saved in your workspace by typing:
 ```{r}
-ls()
+ls() 
 ```
 In RStudio, the Environment tab shows the values:
 
@@ -615,4 +615,4 @@ codes["canada"]
 codes[c("egypt", "italy")]
 ```
 
-
+ㅠ
