@@ -325,7 +325,7 @@ To convert a regular data frame to a tibble, you can use the `as_tibble` functio
 as_tibble(grades) %>% class()
 ```
 
-## ** 4.11 The dot operator**
+## **4.11 The dot operator**
 
 One of the advantages of using the pipe `%>%` is that we do not have to keep naming new objects as we manipulate the data frame. As a quick reminder, if we want to compute the median murder rate for states in the southern states, instead of typing:
 ```{r}
