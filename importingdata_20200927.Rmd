@@ -11,6 +11,7 @@ When creating spreadsheets with text files, like the ones created with a simple 
 
 ![image](https://rafalab.github.io/dsbook/R/img/csv-file.png)
 
+
 The first row contains column names rather than data. We call this a <em>header</em>, and when we read-in data from a spreadsheet it is important to know if the file has a header or not. Most reading functions assume there is a header. To know if the file has a header, it helps to look at the file before trying to read it. This can be done with a text editor or with RStudio. In RStudio, we can do this by either opening the file in the editor or navigating to the file location, double clicking on the file, and hitting <em>View File</em>.
 
 However, not all spreadsheet files are in a text format. Google Sheets, which are rendered on a browser, are an example. Another example is the proprietary format used by Microsoft Excel. These can’t be viewed with a text editor. Despite this, due to the widespread use of Microsoft Excel software, this format is widely used.
