@@ -6,29 +6,137 @@ output: html_notebook
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(ggrepel)
 data4 <- readxl::read_xls("aav8130_Data-S4.xls")
 d4 <- data4 %>% select(`Cell type`, `Gene name`, `Fold change`, `SFARI gene`) 
 ```
 
 ```{r}
-neuronal = c("L2/3","L4","L5/6","L5/6-CC","Neu-mat","Neu-NRGN-I","Neu-NRGN-II","IN-PV","IN-SST","IN-VIP","IN-SV2C" )
-d_4 = d4 %>% mutate('neuronal'= `Cell type` %in% neuronal) %>% 
+neuron = c("L2/3","L4","L5/6","L5/6-CC","Neu-mat","Neu-NRGN-I","Neu-NRGN-II","IN-PV","IN-SST","IN-VIP","IN-SV2C" )
+d_4 = d4 %>% mutate('neuron'= `Cell type` %in% neuron) %>% 
   mutate(`SFARI gene`=ifelse(`SFARI gene`=='yes','SFARI','Non-SFARI'),
-         neuronal=ifelse(neuronal=='TRUE','Neuro','Non-Neuro')) %>%
-  mutate(neuronal_SFARI=paste(`SFARI gene`,neuronal,sep = '/'))
+         neuron=ifelse(neuron=='TRUE','Neuro','Non-Neuro')) %>%
+  mutate(neuronal_SFARI=paste(`SFARI gene`,neuron,sep = '/'))
 ```
 
 
 ```{r}
-p <-d_4 %>% ggplot(aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +        geom_point(size=0.5) + 
+p <-d_4 %>% ggplot(aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +
+  scale_color_manual(breaks = c("Non-SFARI/Neuro", "SFARI/Non-Neuro", "SFARI/Neuro",'Non-SFARI/Non-Neuro'),
+                     values=c('#FAE72D','#2D68FA','#27B244','#9E9CA0'))+
+  geom_point(size=0.6, alpha=0.7) + 
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+
   facet_wrap(~`Cell type`) + 
   theme(axis.text.x = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.y.left = element_text(face='bold',size=5))
+        axis.ticks = element_blank())
 
 p
 ```
++title
+```{r}
+data5 <-read_xlsx('aav8130_Data-S5.xlsx', sheet = 2)
+d5 <-data5 %>% select(DEG, cell_types,`Translation Impact`) %>%
+  separate_rows(.,cell_types,sep = ',')
+```
+
+```{r}
+d5$`Translation Impact`[is.na(d5$`Translation Impact`)]<-'not-defined'
+```
+
+```{r}
+d5 %>% ggplot(aes(x=cell_types,y=`Translation Impact`, fill = `Translation Impact`)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette="Pastel1")+
+  coord_flip()+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank())
+```
+count mutation gene
+
+```{r}
+ifelse(d5$DEG %in% d_4$`Gene name`,d5$DEG, "No")
+```
+```{r}
+d_4 %>% filter(`Gene name`%in%
+                 c("ANKS1A","PTEN","CACNA2D3","PDE4DIP","AKAP9"))
+```
+```{r}
+d_4 <- d_4 %>% mutate('mutated_DEG'=ifelse(`Gene name`==c("AKAP9","CACNA2D3"),TRUE, FALSE))
+```
 
 
+```{r}
+final_plot <-ggplot(d_4, aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +
+  geom_label(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
+  facet_wrap(~`Cell type`) + 
+  scale_color_manual(breaks = c("Non-SFARI/Neuro", "SFARI/Non-Neuro", "SFARI/Neuro",'Non-SFARI/Non-Neuro'),
+                     values=c('#FAE72D','#2D68FA','#27B244','#9E9CA0'))+
+  geom_point(size=0.6, alpha=0.7) + 
+  geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+ 
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank())
+final_plot
+```
 
+```{r}
+p1<- ggplot(d_4 %>% filter(neuron=='Neuro'), aes(`Gene name`,`Fold change`)) +
+  facet_wrap(~`Cell type`) + 
+  geom_point(aes(col=`SFARI gene`), size=0.6, alpha=0.7, show.legend = FALSE)+  
+  scale_color_manual(values = c("#FAE12B","#29C032"))+
+  geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+ 
+  geom_label_repel(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank()) 
+p1
+```
+
+```{r}
+           
+p2 <- ggplot(d_4 %>% filter(neuron=='Non-Neuro'), aes(`Gene name`,`Fold change`)) +
+  geom_label(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
+  facet_wrap(~`Cell type`) + 
+  geom_point(aes(col=`SFARI gene`),size=0.6,alpha=0.7,show.legend = TRUE) +
+  scale_color_manual(values = c("#66666D","#2937C0"))+
+  geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.8)+ 
+  geom_label_repel(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = c(0.85,0.25),
+        legend.background = element_rect(fill="lightblue", 
+                                  size=0.3, linetype="solid"))
+
+p2
+```
+```{r}
+library(cowplot)
+plot_row <- plot_grid(
+  p1,p2,labels = c('Neuron', 'Non Neuron'),rel_widths = c(2.5, 2),
+  label_x = 0.4, label_y = 0.1, label_size = 10)
+
+title <- ggdraw()+
+  draw_label(
+    "DEG Fold Change by Cell type (feat.SFARI)",
+    fontface = 'bold',
+    x = 0,
+    hjust = 0
+  ) +
+  theme(
+    plot.margin = margin(0, 0, 0, 7)
+  )
+plot_grid(
+  title, plot_row,
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+         
+  
+```
+```{r}
+
+```
+
+breaks = c("Non-SFARI/Neuro", "SFARI/Neuro"),
+geom_label(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
