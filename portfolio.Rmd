@@ -1,5 +1,5 @@
 ---
-title: "portfolio"
+title: "Mutations and Translational Impact in DEGs of ASD with comparison to SFARI"
 output:
   html_notebook: 
     fig_width: 12
@@ -12,6 +12,18 @@ output:
     fig_height: 6
     toc: yes
 ---
+## 1. Abstract
+주제에 대한 간략한 설명과 중심 질문에 대한 가설 성립을 바탕으로 전반적인 흐름에 대해 잠시 논하고 시작하도록 하자.
+이 포트폴리오의 목적은 'Single-cell genomics identifies cell type–specific molecular changes in autism'의 data4,5을 이용해서 **SFARI gene과 비교하여 ASD의 DEG에서 나타나는 Mutation과 이에 따른 Translation Impact**을 확인하는 것에 있다. 
+
+먼저 ASD의 DEG 의 fold change을 cell type 별로 보고, SFARI gene과 비교하여 이 data4 상의 DEG임과 동시에 SFARI gene이기도 한 gene들을 찾는다.
+SFARI gene^1과의 비교는 이를 통해 ASD에 기여하는 gene에 대한 신뢰도를 높이고자 함이다. 이렇게 찾은 특정 gene들의 mutation을 data5에서 살펴보고, 그로 인한 translation impact을 예측한다.
+또한 이 "특정 gene"을 앞으로 gene with high reliablity, 즉 `HR_gene`이라 하자.
+
+본격적으로 data와 시각화 자료를 살펴보기에 앞서 특정 gene과 translation impact에 대한 가설을 성립해보자면, 아마 이 특정 gene은 ASD에 국한되어 영향을 미치는 것이 아니라 전반적인 대사과정에 중요한 역할을 맡고 있을 것이다. ASD가 단순히 유전자 1,2개의 이상으로 인한 genetic disorder가 아니고, 복잡한 de novo mutaive polygenic disorder이기 때문이다. 
+
+## 2. Data loading & analysis
+### 2-1) Data4
 ```{r}
 library(tidyverse)
 library(dplyr)
@@ -19,46 +31,55 @@ library(ggplot2)
 library(readxl)
 library(ggrepel)
 data4 <- readxl::read_xls("aav8130_Data-S4.xls")
+
+head(data4)
+```
+이 중 `Cell type`, `Gene name`,`Fold change`, `SFARI gene`의 정보만이 필요하기 때문에 tidy format으로 새롭게 지정해준다. 
+```{r}
 d4 <- data4 %>% select(`Cell type`, `Gene name`, `Fold change`, `SFARI gene`) 
 ```
-
+`Cell type`이 cell line에 대한 정보를 담고 있는데, ASD가 hetero geneous neurodevelopmental condition이라는 점에서 cell line 각각이 neuron인지 아닌지에 대한 정보도 추가로 담기로 한다.
 ```{r}
 neuron = c("L2/3","L4","L5/6","L5/6-CC","Neu-mat","Neu-NRGN-I","Neu-NRGN-II","IN-PV","IN-SST","IN-VIP","IN-SV2C" )
-d_4 = d4 %>% mutate('neuron'= `Cell type` %in% neuron) %>% 
-  mutate(`SFARI gene`=ifelse(`SFARI gene`=='yes','SFARI','Non-SFARI'),
-         neuron=ifelse(neuron=='TRUE','Neuro','Non-Neuro')) %>%
-  mutate(neuronal_SFARI=paste(`SFARI gene`,neuron,sep = '/'))
+d4 = d4 %>% mutate('neuron'= `Cell type` %in% neuron) %>% 
+  mutate(neuron=ifelse(neuron=='TRUE','Neuro','Non-Neuro'),
+        `SFARI gene`=ifelse(`SFARI gene`=='yes','SFARI','Non-SFARI')) %>%
+  mutate(neuronal_SFARI=paste(neuron,`SFARI gene`,sep = '/')) 
+
+head(d4)
 ```
-
-
+### 2-2) Data5
 ```{r}
-p <-d_4 %>% ggplot(aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +
-  scale_color_manual(breaks = c("Non-SFARI/Neuro", "SFARI/Non-Neuro", "SFARI/Neuro",'Non-SFARI/Non-Neuro'),
-                     values=c('#FAE72D','#2D68FA','#27B244','#9E9CA0'))+
+data5 <-read_xlsx('aav8130_Data-S5.xlsx', sheet = 2)
+d5 <-data5 %>% select(DEG, cell_types,`Translation Impact`) %>%
+  separate_rows(.,cell_types,sep = ',') 
+d5$`Translation Impact`[is.na(d5$`Translation Impact`)]<-'not-defined'
+d5$cell_types <- str_trim(d5$cell_types,side = "left")
+d5$`Translation Impact`=factor(d5$`Translation Impact`,levels = c("missense","frameshift","in-frame","stop gain", "not-defined"))
+head(d5)
+```
+## 3. visualization
+## 3-1) d4 visualization
+d4 visualization을 통해 `Cell type`별로 `DEG`의 `fold change`와 `neuron`, `SFARI gene`에 대한 정보를 scatterplot에 담았다.
+```{r}
+p_d4 <-d4 %>% ggplot(aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +
+  scale_color_manual(breaks =                       c("Neuro/SFARI","Neuro/Non-SFARI","Non-Neuro/SFARI",'Non-Neuro/Non-SFARI'),
+                     values=c('#2CA200','#FEE402','#0319FC','#66666D'))+
   geom_point(size=0.6, alpha=0.7) + 
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+
   facet_wrap(~`Cell type`) + 
   theme(axis.text.x = element_blank(),
         axis.ticks = element_blank())
 
-p
+p_d4
 ```
-+title
-```{r}
-data5 <-read_xlsx('aav8130_Data-S5.xlsx', sheet = 2)
-d5 <-data5 %>% select(DEG, cell_types,`Translation Impact`) %>%
-  separate_rows(.,cell_types,sep = ',') 
-d5$cell_types <- str_trim(d5$cell_types)
+이 때, point color에 대한 설명을 하자면 neuron은 노랑색, SFARI gene은 파랑색, 이 둘 모두에 속하면 두 색의 합인 초록색, 둘 모두에 속하지 않으면 회색으로 지정하였다.
 
-```
-
+### 3-2) d5 visualization
+d5 visualization을 통해 `cell type`별로의 `Translation Impact`에 대한 정보를 barplot에 담았다.
 ```{r}
-d5$`Translation Impact`[is.na(d5$`Translation Impact`)]<-'not-defined'
-```
-
-```{r}
-d5 %>% ggplot(aes(x=cell_types,y=`Translation Impact`, fill = `Translation Impact`)) +
-  geom_bar(stat = "identity") +
+p_d5_1 <- d5 %>% ggplot(aes(x=cell_types,y=`Translation Impact`, fill = `Translation Impact`)) +
+  geom_bar(stat = "identity",position = "stack" ) +
   scale_fill_brewer(palette="Pastel2")+
   coord_flip()+
   ggtitle("Translation Impact by Cell type")+
@@ -67,42 +88,58 @@ d5 %>% ggplot(aes(x=cell_types,y=`Translation Impact`, fill = `Translation Impac
         axis.title.x = element_blank(),
         panel.grid.major = element_blank())+
   labs(fill="mutation")
-```
-count mutation gene
 
-```{r}
-ifelse(d5$DEG %in% d_4$`Gene name`,d5$DEG, "No")
+p_d5_1
 ```
-```{r}
-d_4 %>% filter(`Gene name`%in%
-                 c("ANKS1A","PTEN","CACNA2D3","PDE4DIP","AKAP9"))
-```
-```{r}
-d_4 <- d_4 %>% mutate('mutated_DEG'=ifelse(`Gene name`==c("AKAP9","CACNA2D3"),TRUE, FALSE))
-```
+전반적인 mutation 분포를 살펴볼 수 있다.
 
-
-```{r}
-final_plot <-ggplot(d_4, aes(`Gene name`,`Fold change`,col=`neuronal_SFARI`)) +
-  geom_label(data=d_4 %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=2)+
-  facet_wrap(~`Cell type`) + 
-  scale_color_manual(breaks = c("Non-SFARI/Neuro", "SFARI/Non-Neuro", "SFARI/Neuro",'Non-SFARI/Non-Neuro'),
-                     values=c('#FAE72D','#2D68FA','#27B244','#9E9CA0'))+
-  geom_point(size=0.6, alpha=0.7) + 
-  geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+ 
-  theme(axis.text.x = element_blank(),
-        axis.ticks = element_blank())
-final_plot
+DEG 별로 어떤 mutation을 갖고 있는지 역시 확인해보자.
+```{r,fig.width=6}
+p_d5_2 <-d5 %>% ggplot(aes(cell_types,DEG,col=cell_types)) +
+  geom_point(size=1, alpha=0.7) + 
+  geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+
+  geom_label_repel(data = d5, aes(label=DEG),size=2.5)+
+  facet_grid(`Translation Impact`~.)+ 
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank())
+p_d5_2
 ```
+### 3-3) self feedback
+위의 plot들을 통해 필요한 정보들을 시각화하여 볼 수 있다.
+하지만 원하고자 하는 정보의 합산과 몇몇 사항의 수정이 필요해보인다.
 
+먼저, data4와 data5의 DEG list가 다르기 때문에 p_d4 plot에서 볼 수 있는 `HR_gene`의 mutation type을 알기 위해서는 두 data의 DEG 중 겹치는 것이 있는지 알아봐야 한다.
+또한  p_d4 plot의 경우 multipanel이 너무 많아 한 눈에 보기에 다소 복잡하다.
+Neuron/Non-Neuron에 따라 나누어 볼 수 있도록 수정이 필요하다. 
+
+일단 data5에 기재되어 있는 `HR_gene`을 찾고 표기해보자.
+```{r}
+d4 %>% filter(d4$`SFARI gene` == 'SFARI' & d4$`Gene name` %in% d5$DEG)
+```
+`HR_gene`은 **AKAP9**,**CACNA2D3**,**PTEN** 이다.
+
+p_d5_2을 참고해서 `HR_gene`의 mutation type을 확인해보면 **AKAP9**는 frameshift, **CACNA2D3**와 **PTEN**은 missense이다.
+
+d4에 `HR_gene`과 `HR_gene`의 mutation type의 column을 추가하자.
+```{r}
+d4 <- d4 %>% mutate(HR_gene= ifelse(d4$`SFARI gene` == 'SFARI' & d4$`Gene name` %in% d5$DEG,TRUE, FALSE))
+d4 <- d4 %>%mutate(HRG_mutation= paste(d4$`Gene name`)) 
+d4$HRG_mutation <- gsub("AKAP9","AKAP9/frameshift",d4$HRG_mutation)
+d4$HRG_mutation <-gsub("CACNA2D3","CACNA2D3/missense",d4$HRG_mutation) 
+d4$HRG_mutation <-gsub("PTEN","PTEN/missense",d4$HRG_mutation,)
+head(d4)
+```
+이제 최종 plot을 그려보자.
+Neuron,Non-Neuron으로 나누어 각각 plot을 그린 뒤 plot_grid을 이용해 하나의 plot으로 합치고, `HR_gene`의 mutation type인 `HRG_mutaion`을 label로 표현할 것이다.
 ```{r, fig.width=6}
-d_4_N <- d_4 %>% filter(neuron=='Neuro')
-p1<- ggplot(d_4_N, aes(`Gene name`,`Fold change`)) +
+d4_N <- d4 %>% filter(neuron=='Neuro')
+p1<- ggplot(d4_N, aes(`Gene name`,`Fold change`)) +
   facet_wrap(~`Cell type`) + 
   geom_point(aes(col=`SFARI gene`), size=0.8, show.legend = TRUE)+  
   scale_color_manual(values = c("#FEE402","#2CA220"))+
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+ 
-  geom_label_repel(data=d_4_N %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=3.5, nudge_x = 0.3, nudge_y = 0.2)+
+  geom_label_repel(data=d4_N %>% filter(HR_gene==TRUE),aes(label=HRG_mutation),size=3.5, nudge_x = 0.3, nudge_y = 0.2)+
   scale_y_continuous(breaks= c(-0.5, 0, 0.5))+
   theme(axis.text.x = element_blank(),
         axis.ticks = element_blank(),
@@ -115,13 +152,13 @@ p1
 
 
 ```{r, fig.width=6}
-d_4_NN <-d_4 %>% filter(neuron=='Non-Neuro')        
-p2 <- ggplot(d_4_NN, aes(`Gene name`,`Fold change`)) +
+d4_NN <- d4 %>% filter(neuron=='Non-Neuro')        
+p2 <- ggplot(d4_NN, aes(`Gene name`,`Fold change`)) +
   facet_wrap(~`Cell type`) + 
   geom_point(aes(col=`SFARI gene`),size=0.8,show.legend = TRUE) +
   scale_color_manual(values = c("#66666D","#0319FC"))+
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.8)+ 
-  geom_label_repel(data=d_4_NN %>% filter(mutated_DEG==TRUE),aes(label=`Gene name`),size=3.5,nudge_x = 0.3, nudge_y = 0.2)+
+  geom_label_repel(data=d4_NN %>% filter(HR_gene==TRUE),aes(label=HRG_mutation),size=3.5,nudge_x = 0.3, nudge_y = 0.2)+
   theme(axis.text.x = element_blank(),
         axis.ticks = element_blank(),
         axis.title.x = element_blank(),
@@ -132,22 +169,23 @@ p2 <- ggplot(d_4_NN, aes(`Gene name`,`Fold change`)) +
 
 p2
 ```
+p1과 p2, 이 2가지 plot을 합쳐보자.
 ```{r, fig.width=6}
 library(cowplot)
 
 plot_row <- plot_grid(
   p1,p2,labels = c('Neuron', 'Non Neuron'),rel_widths = c(2.7, 2),
-  label_x = 0.4, label_y = 0.1, label_size = 15)
+  label_x = 0.4, label_y = 0.05, label_size = 15)
 
-title <- ggdraw()+
+title <- ggdraw() +
   draw_label(
-    "DEG Fold Change by Cell type (feat.SFARI)",
+    "DEG Fold Change by Cell type (feat.SFARI) \n & Mutation Type of HR_gene",
     fontfamily = "serif",
     fontface = 'bold',
     color = '#0C1783',
     x = 0,
     hjust = 0,
-    size = 30
+    size = 20
   ) +
   theme(
     plot.margin = margin(0, 0, 0, 7)
@@ -161,6 +199,6 @@ plot <-plot_grid(
 
 plot
 ```
-```{r}
 
-```
+
+
