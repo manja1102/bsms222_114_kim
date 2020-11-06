@@ -98,7 +98,7 @@ p_d5_1
 DEG 별로 어떤 mutation을 갖고 있는지 역시 확인해보자.
 ```{r,fig.width=6}
 p_d5_2 <-d5 %>% ggplot(aes(cell_types,DEG,col=cell_types)) +
-  geom_point(size=1, alpha=0.7) + 
+  geom_point(size=1.5, alpha=0.7) + 
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+
   geom_label_repel(data = d5, aes(label=DEG),size=2.5)+
   facet_grid(`Translation Impact`~.)+ 
@@ -173,7 +173,7 @@ p2 <- ggplot(d4_NN, aes(`Gene name`,`Fold change`)) +
 p2
 ```
 p1과 p2, 이 2가지 plot을 합쳐보자.
-```{r, fig.width=6}
+```{r, fig.width=6, fig.height=4.5}
 library(cowplot)
 
 plot_row <- plot_grid(
@@ -191,8 +191,10 @@ title <- ggdraw() +
     size = 20
   ) +
   theme(
-    plot.margin = margin(0, 0, 0, 7)
-  )
+    plot.margin = margin(0, 0, 0, 7),
+    plot.caption = element_text(hjust=0.9, vjust = 1, size=9)
+  )+
+  labs(caption="labels indicate HR genes with known mutation type \n (HR_gene: DEGs included in SFARI database)")
 
 final_plot <-plot_grid(
   title, plot_row,
@@ -205,7 +207,7 @@ final_plot
 final plot을 통해 `HR_gene`인 **AKAP9**,**CACNA2D3**,**PTEN**의 `foldchange`가 각각 음수,음수,양수임을 알 수 있다.
 이를 통해 up/down regulation 역시 확인 가능하다.
 
-## 4.Conclusion
+## 4. Conclusion
 `HR_gene`이 어떤 gene인지, 체내에서 어떤 역할을 담당하고 있는지 간략히 알아보도록 하자.
 
 <em>**AKAP9**</em>
@@ -237,4 +239,23 @@ PTEN은 유명한 tumor suppressor gene으로 DNA methylation 등의 이유로 P
 먼저 `HR_gene`이 cell type에 따라서 cancer, 또는 뇌세포에 문제를 일으키는 뇌질환 등 세포의 이상으로 인한 여러가지 질병에 영향을 준다고 해석할 수 있다. 
 즉, tumorigenesis에 영향을 줄 만큼 `HR_gene`이 전반적인 세포의 성장 및 대사 과정에 있어 중요한 역할을 하고 있기에 ASD뿐만 아니라 여러 질병에서 mutation을 나타낼 가능성이 있어서 `HR_gene`가 ASD에만 특이적인 ASD associated gene으로 보기에는 어렵다는 것이다.  
 다른 방식으로 접근해보면 ASD와 cancer 사이의 연결고리를 찾을 수도 있다. 이를 통해 상호보완적인 therapeutic target을 발견한다면 더없이 좋을 것이다. 앞으로 이러한 점들을 고려하여 추가 분석 및 실험이 필요하다고 생각한다.
+
+### Reference
+
+1. Chalhoub. et al. (2009). PTEN and the PI3-Kinase Pathway in Cancer. Annual Review of Pathology: Mechanisms of Disease, 4(1), 127–150. https://doi.org/10.1146/annurev.pathol.4.110807.092311
+
+2. Wanajo, A. et al (2008). Methylation of the Calcium Channel-Related Gene, CACNA2D3, Is Frequent and a Poor Prognostic Factor in Gastric Cancer. Gastroenterology, 135(2), 580-590.e3. https://doi.org/10.1053/j.gastro.2008.05.041
+
+3. Jin, Y. et al (2017). CACNA2D3 is downregulated in gliomas and functions as a tumor suppressor: CACNA2D3 IS A TUMOR SUPPRESSOR IN GLIOMAS. Molecular Carcinogenesis, 56(3), 945–959. https://doi.org/10.1002/mc.22548
+
+4. Nie, C. et al (2019). CACNA2D3 Enhances the Chemosensitivity of Esophageal Squamous Cell Carcinoma to Cisplatin via Inducing Ca2+-Mediated Apoptosis and Suppressing PI3K/Akt Pathways. Frontiers in Oncology, 9, 185. https://doi.org/10.3389/fonc.2019.00185
+
+5. Forés-Martos, J. et al (2019). Transcriptomic metaanalyses of autistic brains reveals shared gene expression and biological pathway abnormalities with cancer. Molecular Autism, 10(1), 17. https://doi.org/10.1186/s13229-019-0262-8
+
+6. iao, X., & Li, Y. (2020). Genetic associations between voltage-gated calcium channels and autism spectrum disorder: A systematic review. Molecular Brain, 13(1), 96. https://doi.org/10.1186/s13041-020-00634-0
+
+7. Forés-Martos, J.et al (2019). Transcriptomic metaanalyses of autistic brains reveals shared gene expression and biological pathway abnormalities with cancer. Molecular Autism, 10(1), 17. https://doi.org/10.1186/s13229-019-0262-8
+
+
+
 
