@@ -77,7 +77,7 @@ p_d4
 ```
 이 때, point color에 대한 설명을 하자면 neuron은 노랑색, SFARI gene은 파랑색, 이 둘 모두에 속하면 두 색의 합인 초록색, 둘 모두에 속하지 않으면 회색으로 지정하였다.
 
-### 3-2) d5 visualization
+### 3-2) d5 Visualization
 d5 visualization을 통해 `cell type`별로의 `Translation Impact`에 대한 정보를 barplot에 담았다.
 ```{r}
 p_d5_1 <- d5 %>% ggplot(aes(x=cell_types,y=`Translation Impact`, fill = `Translation Impact`)) +
@@ -226,6 +226,7 @@ CACNA2D3는 calciun channel 합성을 조절하는 gene인데 뇌세포에서의
 또한 ASD에서는 PI3K/AKT/MTOR pathway의 dysregulation이 관찰되는데 이 pathway에 PTEN 역시 포함되어 있다.
 
 흥미로운 점은 이 3가지 gene 모두 tumor와의 연관성을 가지고 있다는 것이다. 
+
 AKAP9의 경우 이 data에서 나타난 frameshift mutation 뿐 아니라 다른 somatic mutation 역시 high MSI을 보이며 gastric, colorectal 등의 cancer에 영향을 준다. 
 CACNA2D3 역시 정상적인 gene은  intracellular calcium (Ca2+)을 증가시켜 apoptosis을 유도하거나 upregulation of NLK (through the Wnt/Ca2+pathway), EMT 억제 등을 하며 cancer cell에서 tumor suppressor의 모습을 보인다. 
 PTEN은 유명한 tumor suppressor gene으로 DNA methylation 등의 이유로 PTEN에 mutation이 일어나게 되면 PI3K pathway의 negative feedback이 중단되어 PI3K pathway가 과도하게 활성화되며 tumor의 성장을 돕는다.
