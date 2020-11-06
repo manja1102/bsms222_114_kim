@@ -22,7 +22,7 @@ output:
 
 >SFARI Gene is an evolving database for the autism research community that is centered on genes implicated in autism susceptibility
 
-본격적으로 data와 시각화 자료를 살펴보기에 앞서 특정 gene과 translation impact에 대한 가설을 성립해보자면, 아마 이 특정 gene은 ASD에 국한되어 영향을 미치는 것이 아니라 전반적인 대사과정에 중요한 역할을 맡고 있을 것이다. ASD가 단순히 유전자 1,2개의 이상으로 인한 genetic disorder가 아니고, 복잡한 de novo mutaive polygenic disorder이기 때문이다. 
+본격적으로 data와 시각화 자료를 살펴보기에 앞서 특정 gene과 translation impact에 대한 가설을 성립해보자면, 아마 이 특정 gene은 ASD에 국한되어 영향을 미치는 것이 아니라 전반적인 대사과정에 중요한 역할을 맡고 있을 것이다. ASD가 단순히 유전자 1,2개의 이상으로 인한 genetic disorder가 아니고, 복잡한 de novo mutative polygenic disorder이기 때문이다. 
 
 ## 2. Data loading & analysis
 ### 2-1) Data4
@@ -116,7 +116,7 @@ p_d5_2
 또한  p_d4 plot의 경우 multipanel이 너무 많아 한 눈에 보기에 다소 복잡하다.
 Neuron/Non-Neuron에 따라 나누어 볼 수 있도록 수정이 필요하다. 
 
-일단 data5에 기재되어 있는 `HR_gene`을 찾고 표기해보자.
+일단 data5에 기재되어 있어서 mutation type을 확인할 수 있는 `HR_gene`을 찾고 표기해보자.
 ```{r}
 d4 %>% filter(d4$`SFARI gene` == 'SFARI' & d4$`Gene name` %in% d5$DEG)
 ```
@@ -138,11 +138,11 @@ Neuron,Non-Neuron으로 나누어 각각 plot을 그린 뒤 plot_grid을 이용�
 ```{r, fig.width=6}
 d4_N <- d4 %>% filter(neuron=='Neuro')
 p1<- ggplot(d4_N, aes(`Gene name`,`Fold change`)) +
-  facet_wrap(~`Cell type`) + 
   geom_point(aes(col=`SFARI gene`), size=0.8, show.legend = TRUE)+  
   scale_color_manual(values = c("#FEE402","#2CA220"))+
   geom_hline(yintercept = 0.0, color= '#D7D6C6', alpha=0.7)+ 
   geom_label_repel(data=d4_N %>% filter(HR_gene==TRUE),aes(label=HRG_mutation),size=3.5, nudge_x = 0.3, nudge_y = 0.2)+
+  facet_wrap(~`Cell type`) + 
   scale_y_continuous(breaks= c(-0.5, 0, 0.5))+
   theme(axis.text.x = element_blank(),
         axis.ticks = element_blank(),
@@ -210,16 +210,15 @@ final plot을 통해 `HR_gene`인 **AKAP9**,**CACNA2D3**,**PTEN**의 `foldchange
 
 <em>**AKAP9**</em>
 :encoding A-kinase anchor protein 9.
-AKAP9 protein plays an important role in centrosome duplication, cell cycle progression and maintenance of cell membrane integrity, alterations of which contribute to tumorigenesis. 
+AKAP9 protein plays an important role in centrosome duplication, cell cycle progression and maintenance of cell membrane integrity.
 
 <em>**CACNA2D3**</em>
 :encoding Calcium channel, voltage-dependent, alpha 2/delta subunit 3.
-a potential tumor suppressor function in multiple tumor types
 
 <em>**PTEN**</em> 
 :encoding Phosphatase and tensin homolog (PTEN).
 acts as a tumor suppressor gene through the action of its phosphatase protein product. 
-PTEN protein is negative regulators of the PI3-kinase pathway, which regulates growth, survival, and proliferation. These key signaling components(PI3K, PTEN) are two of the most frequently mutated proteins in human cancers, resulting in unregulated activation of PI3K signaling and providing irrefutable genetic evidence of the central role of this pathway in tumorigenesis. PTEN regulates PI3K signaling by dephosphorylating the lipid signaling intermediate PIP3.
+PTEN protein is negative regulators of the PI3-kinase pathway, which regulates growth, survival, and proliferation. PTEN regulates PI3K signaling by dephosphorylating the lipid signaling intermediate PIP3.
 
 또한 현재까지 밝혀진 `HR_gene`이 ASD에 미치는 영향과 어떻게 기여하는지 짚고 넘어갈 필요가 있다.
 
@@ -229,12 +228,12 @@ CACNA2D3는 calciun channel 합성을 조절하는 gene인데 뇌세포에서의
 흥미로운 점은 이 3가지 gene 모두 tumor와의 연관성을 가지고 있다는 것이다. 
 AKAP9의 경우 이 data에서 나타난 frameshift mutation 뿐 아니라 다른 somatic mutation 역시 high MSI을 보이며 gastric, colorectal 등의 cancer에 영향을 준다. 
 CACNA2D3 역시 정상적인 gene은  intracellular calcium (Ca2+)을 증가시켜 apoptosis을 유도하거나 upregulation of NLK (through the Wnt/Ca2+pathway), EMT 억제 등을 하며 cancer cell에서 tumor suppressor의 모습을 보인다. 
-PTEN은 유명한 tumor suppressor gene으로, DNA methylation 등의 이유로 PTEN에 mutation이 일어나게 되면 PI3K pathway의 negative feedback이 중단되어 tumor의 성장을 돕는다.
+PTEN은 유명한 tumor suppressor gene으로 DNA methylation 등의 이유로 PTEN에 mutation이 일어나게 되면 PI3K pathway의 negative feedback이 중단되어 PI3K pathway가 과도하게 활성화되며 tumor의 성장을 돕는다.
 
 >MSI: microsatellite instability  EMT: epithelial‐to‐mesenchymal transition.
 
 이가 시사하는 바는 많다.
 먼저 `HR_gene`이 cell type에 따라서 cancer, 또는 뇌세포에 문제를 일으키는 뇌질환 등 세포의 이상으로 인한 여러가지 질병에 영향을 준다고 해석할 수 있다. 
-즉, tumorigenesis에 영향을 줄 만큼 `HR_gene`이 전반적인 대사 과정에 있어 중요한 역할을 하고 있기에 ASD뿐만 아니라 여러 질병에서 mutation을 나타낼 가능성이 있어서 `HR_gene`가 ASD에만 특이적인 ASD associated gene으로 보기에는 어렵다는 것이다.  
+즉, tumorigenesis에 영향을 줄 만큼 `HR_gene`이 전반적인 세포의 성장 및 대사 과정에 있어 중요한 역할을 하고 있기에 ASD뿐만 아니라 여러 질병에서 mutation을 나타낼 가능성이 있어서 `HR_gene`가 ASD에만 특이적인 ASD associated gene으로 보기에는 어렵다는 것이다.  
 다른 방식으로 접근해보면 ASD와 cancer 사이의 연결고리를 찾을 수도 있다. 이를 통해 상호보완적인 therapeutic target을 발견한다면 더없이 좋을 것이다. 앞으로 이러한 점들을 고려하여 추가 분석 및 실험이 필요하다고 생각한다.
 
