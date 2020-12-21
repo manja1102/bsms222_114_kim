@@ -1,5 +1,5 @@
 ---
-title: "Mutations and Translational Impact in DEGs of ASD with comparison to SFARI"
+title: "Effect of Genetic Variants on DEG with comparison to Satterstrom"
 output:
   html_notebook: 
     fig_width: 12
@@ -44,6 +44,8 @@ d4 <- data4 %>% select(`Cell type`, `Gene name`, `Fold change`, `q value`, Satte
 ```{r}
 neuron = c("L2/3","L4","L5/6","L5/6-CC","Neu-mat","Neu-NRGN-I","Neu-NRGN-II","IN-PV","IN-SST","IN-VIP","IN-SV2C" )
 d4 <- d4 %>% mutate(neuronal = ifelse(`Cell type` %in% neuron, "neuron", "non-neuron"))
+d4_n <- d4 %>% filter(neuronal=="neuron")
+d4_nn <- d4 %>% filter(neuronal=="non-neuron")
 head(d4)
 ```
 `HR_gene`에 해당하는 d4 data와 pLI 정보를 합치기 위해 "Large-Scale Exome Sequencing Study Implicates Both Developmental and Functional Changes in the Neurobiology of Autism"의 supplemental data table 2를 `merge`해준다.
@@ -58,7 +60,9 @@ d4_s_sat = merge(d4_s, d4_sat, by = 'gene')
 d4 visualization을 통해 `Cell type`별로 `DEG`의 `fold change`와 `neuron`, `Satterstrom gene`에 대한 정보를 volcano plot에 담았다.
 
 ### 3.1 1st Plot - DEG Fold Change by Cell type (feat.Satterstrom)
-```{r fig.height=3, fig.width=6}
+
+```{r}
+
 p1<- d4_n %>% 
   ggplot(aes(x=`Fold change`, y= -log10(`q value`), col= `Cell type`)) + 
   geom_point(size=1.0, alpha=0.8) +
@@ -99,6 +103,8 @@ p2<- d4_nn %>%
 
 plot_row <- plot_grid(p1,p2)
 
+
+
 title <- ggdraw() +
   draw_label(
     "DEG Fold Change by Cell type (feat.Satterstrom) ",
@@ -114,11 +120,14 @@ plot1 <-plot_grid(
    ncol = 1,
   rel_heights = c(0.1, 1)
 )
+```
+```{r echo=TRUE, fig.height=3, fig.width=6}
 plot1
 ```
+
 ### 3.2 2nd Plot - pLI of `HR_gene`
 위의 volcaono plot label에서 확인할 수 있는 `HR_gene`의 pLI를 heatmap으로 visualization한다.
-```{r}
+```{r echo=TRUE}
 rd <- d4_s_sat %>% select(`Cell type`, gene, pLI)
 rd <- rd %>% pivot_wider(names_from = gene, values_from = pLI) 
 rd <- pivot_longer(rd,!`Cell type`, names_to = 'gene', values_to = 'pLI')
@@ -138,7 +147,7 @@ cell type 별로 `HR_gene`의 pLI score를 색깔을 통해 알 수 있다.
 ## 4. Conclusion
 1st Plot을 통해 neuron/ non neuron으로 나눠 cell type 별로 DEG의 fold change와 Satterstrom gene에 해당하는 `HR_gene`을 확인할 수 있다. 
 Neuronal cell line의 경우 _DPYSL2_, _RFX3_, _FOXP2_, _TCF4_, _LRRC4C_, _NRXN1_,	_RORB_, _CELF4_, _AP2S1_,	_GRIA2_, _KIAA0232_, _NRXN1_,	_GABRB2_, _BCL11A_ 이 있고,
-Non neuronal cell line의 경우 _FOXP2_, _ARID1B_, _ZMYND8_, _CACNA2D3_, _NSD1_, _PTEN_, _KMT2E_이 있다. 
+Non neuronal cell line의 경우 _FOXP2_, _ARID1B_, _ZMYND8_, _CACNA2D3_, _NSD1_, _PTEN_, _KMT2E_ 이 있다. 
 
 2nd Plot을 통해 `HR_gene` 21개 (같은 gene이라 하더라도 cell type이 다르면 각각 개수를 세었을 때) 중 18개가 pLI score 0.95 이상임을 볼 수 있다.
 이를 통해 `HR_gene` 대부분이 LOF에 intolerant 하다는 것을 알게 되었다. 
