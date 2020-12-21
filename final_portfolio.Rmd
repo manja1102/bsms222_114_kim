@@ -1,0 +1,98 @@
+---
+title: "Final Portfolio"
+output: html_notebook
+---
+# 1. data base analysis
+## 1-1. data base 목적 및 개요
+**CCLE(Cancer Cell Line Encyclopedia)**
+CCLE project는 대규모 human cancer model panel의 상세한 유전적 및 약리학적 특성 분석을 수행한다. 또한   고유한 약리학적 취약성을 Genome pattern에 연결하고 cell line integrative genomics을 암 환자 계층화로 변환하는 통합 계산 분석을 개발한다. CCLE는  CCLE project data가 모인 즉, 1100개 이상의 **cancer cell line에 대한 genome data, 분석 및 시각화에 대한 공개 access를 제공하는 database**이고 이는 누구나 접근 및 다운로드가 가능하다.
+
+## 1-2. data base 구성
+genome data는 주로 Copy Number, mRNA expression (Affy), RPPA, RRBS, and mRNA expression (RNAseq), oncomap mutation, Pharmacological Profiling, hybrid  capture sequencing 등에 대한 정보를 가지고 있다. box plot, scatter plot, bubble map 등의 방식으로 시각화 역시 할 수 있다. 
+
+# 2. Introduction
+ferroptosis는 철분 의존성 lipid ROS 축적으로 인한 세포 사멸로, _AIFM2_ (apoptosis inducing factor mitochondria associated 2), _GPX4_ (glutathione peroxidase 4 encoding gene), _SLC7A11_ (cystein transport encoding gene) mutation의 영향을 많이 받는다. "CCLE_RNAseq_genes_rpkm_20180929.gct.gz" data를 이용해 cancer cell line site (organ) 별로 대표적인 ferroptosis suppressing gene ( _AIFM2_, _GPX4_, _SLC7A11_)의 mRNA expression을 확인 및 비교하고자 한다. 또한 mRNA expression이 site가 달라도 일정한지, site specific change를 보이는지 알아보려 한다. 
+이때, data의 RPKM은 Reads Per Kilobase per Millions mapped reads의 줄임말로 일종의 normalized sequencing expression이다. 전체 유전자의 길이를 Kilobase(=1000 base pair)로 정규화했을 때 전체 reads 중에서 해당 gene에 mapping된 reads를 의미한다. 
+
+# 3. data loading & analysis
+우선 필요한 data를 loading하고, 필요한 package를 설치한다.
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(hrbrthemes)
+library(viridis)
+library(cowplot)
+data <- read_delim('CCLE_RNAseq_genes_rpkm_20180929 (1).gct.gz', skip = 2, delim = '\t')
+info <- read_delim('Cell_lines_annotations_20181226.txt', delim = '\t')
+```
+data를 간략히 살펴본다.
+```{r}
+head(data)
+```
+column names이 cancer cell type임을 cell line annotation data를 통해 확인한다. cancer cell line with site 별로 gene mRNA expression을 알 수 있다.
+```{r}
+head(info)
+```
+gene ensemble id, name, cell line_site의 정보가 담겨 있는 wide format data이다. 
+이를 분석 및 시각화하기에 용이하게 3개의 ferroptosis gene에 대한 long format으로 바꿔준다. 
+```{r}
+d_fg <- data %>% filter(Description %in% c('AIFM2','GPX4', 'SLC7A11')) %>% select(!Name)
+d_fg <- pivot_longer(d_fg, cols = !Description)
+d_fg_cell_line <- d_fg$name
+d_fg_site <- character(0)
+for (i in 1:3057) {
+  d_fg_site[i] = str_split(d_fg_cell_line, '_', n=2)[[i]][2]
+  }
+d_fg = d_fg %>% mutate(site = d_fg_site)
+head(d_fg)
+```
+```{r}
+table(d_fg$site)
+```
+
+site 내에 cancer cell line이 30개 이하인 경우 box plot을 통하여 보여주기에 sample size가 적다고 생각하였다. 따라서 30개가 채 되지 않는 _PLEURA_, _SALIVARY_GLAND_, _SMALL_INTESTINE_, _BILIARY_TRACT_, _CERVIX_, _PROSTATE_는 제외하였다. 
+```{r}
+d <- d_fg %>% filter(!(site %in% c('PLEURA', 'SALIVARY_GLAND', 'SMALL_INTESTINE', 'BILIARY_TRACT', 'CERVIX', 'PROSTATE')))
+d
+```
+# 4. Visualization-ferroptosis suppressing gene expression
+ferroptosis suppressing gene 3개의 expression 값을 box plot을 통해 site 별로 볼 수 있도록 한다.
+이 때, mRNA expression (RPKM) value는 log10을 처리함으로써 normalization과 함께 분포를 더 세세히 볼  수 있도록 한다. 
+```{r fig.height=3.5, fig.width=8}
+d <- d %>% mutate(ferroptosis = ifelse(Description=="AIFM2",'Inducing', 'Suppressing'))
+
+p1 <- d %>% ggplot(aes(x=site, y=log10(value), fill=site)) + 
+  geom_boxplot(
+    alpha=0.3,
+    outlier.colour="red",
+    outlier.fill="red",
+    outlier.size=2)+
+  theme(legend.position="none") +
+  xlab("")+
+  coord_flip()+
+  ggtitle("ferroptosis suppressing gene expression")+
+  facet_grid(.~ Description)+
+  ylab("log10(mRNA expression)")+
+  theme_light()+
+  theme(plot.title = element_text(family = "serif", face = "bold", size = 25),
+        axis.title.x = element_text(size = 15),
+        strip.text.x = element_text(size = 15, color = "black", face = "bold"),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 10, face = "bold"),
+        legend.position = "none")
+
+p1
+```
+# 5. Conclusions
+_GPX4_가 _AIFM2_, _SLC7A11_보다 평균적인 mRNA expression 값도 훨씬 높고 전체적인 site에서 비슷한 값을 가진다. 반면 _AIFM2_와 _SLC7A11_은 site 별로 차이도 있을 뿐더러 minimun value와 maximum value의 폭도 크다. 또한 평균 값도 _GPX4_에 비해 적다. 
+이는 _GPX4_가 다른 2개의 gene에 비하여 ferroptosis에 미치는 직접적인 영향이 더 크거나, ferroptosis 뿐만 아니라 전반적인 ROS level에 큰 영향을 주는 gene임을 시사할 수 있다.
+DEG, WGCNA 또는 kock-out 후 survavial analysis 등의 추가적인 분석이 필요하지만, site 별로 차이가 없고 일정하게 높은 발현값을 가지는 _GPX4_와 이와는 반대인 경향을 가지는 _AIFM2_, _SLC7A11_ 사이에 차이가 있음을 알 수 있게 되었다. 이와 관련하여 이 3개의 gene이 ferroptosis pathway와 어느 정도의  연관성을 가지는지, 다른 gene cluster module을 가지는지 더 연구해보면 좋을 것이다. 
+
+
+
+
+
+
+
