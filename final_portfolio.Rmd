@@ -52,7 +52,7 @@ head(d_fg)
 table(d_fg$site)
 ```
 
-site 내에 cancer cell line이 30개 이하인 경우 box plot을 통하여 보여주기에 sample size가 적다고 생각하였다. 따라서 30개가 채 되지 않는 PLEURA, SALIVARY_GLAND, SMALL_INTESTINE, BILIARY_TRACT, CERVIX, PROSTATE는 제외하였다. 
+site 내에 cancer cell line이 30개 이하인 경우 box plot을 통하여 보여주기에 sample size가 적다고 생각하였다. 따라서 30개가 채 되지 않는 PLEURA, SALIVARY_GLAND, SMALL_INTESTINE, BILIARY_TRACT, CERVIX, PROSTATE는 제외하였다.    
 ```{r}
 d <- d_fg %>% filter(!(site %in% c('PLEURA', 'SALIVARY_GLAND', 'SMALL_INTESTINE', 'BILIARY_TRACT', 'CERVIX', 'PROSTATE')))
 d
